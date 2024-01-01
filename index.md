@@ -1,5 +1,5 @@
 ---
-title: Geometric Constraints in Large-Scale Bundle Adjustment
+title: Geometric Constraints in Bundle Adjustment
 ---
 
 # index header
