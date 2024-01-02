@@ -5,7 +5,7 @@ title: Relative Geometry Constraints in Ceres
 <br>
 
 <p align="center">
-  <img src="diagrams/intro_car_side.png" alt="intro car side image"/>
+  <img src="diagrams/optimization_with_geometric_constraints.png" alt="Optimization with Geometric Constraints"/>
 </p>
 
 <br>
