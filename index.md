@@ -50,7 +50,7 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
     const T* intrinsics = intrinsic_params;
 
     // Conjugate of the quaternion for inverse rotation.
-    // Eigen uses x,y,z,w format when loading in quaternions this way (it's the API that is wrong)
+    // Eigen uses x,y,z,w format when loading in quaternions this way
     T conjugate_quaternion[4] = {quaternion[0], 
                                  -quaternion[1], 
                                  -quaternion[2], 
