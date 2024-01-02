@@ -54,7 +54,7 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
   <img src="diagrams/camera_params.jpg" alt="Camera Parameters"/>
 </p>
 
-## Some Boring Parameter Blocks
+## Some basic parameter blocks
 
 ```bash
 for (int i = 0; i < quat_problem.num_observations(); ++i) {
@@ -79,7 +79,7 @@ for (int i = 0; i < quat_problem.num_observations(); ++i) {
 
 ```
 
-## A Boring Cost Function (reprojection error)
+## A basic cost function (reprojection error)
 
 A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error.
 
