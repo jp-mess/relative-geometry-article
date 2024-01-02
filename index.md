@@ -26,7 +26,7 @@ You'll notice that the cameras in this picture are all in a ring. Indeed, they w
 1. Planes, lines, or other geometric shapes with a small number of parameters
 2. Relative distances (enforce all cameras to be the same distance away)
 
-You cannot, however, enforce "inequality" constraints this way. You'd need to modify the optimizer itself for that, which is not easy in ceres.
+You cannot, however, enforce "inequality" constraints this way. You'd need to modify the optimizer itself for that, which is not easy in ceres. This writeup does not introduce any newfound algorithm, but tries to quantify and document the effectiveness of this approach, and gives the reader some easy-to-setup C++ simulations so they can try it themselves.
 
 <br>
 <br>
@@ -64,6 +64,9 @@ The `project` function applies the camera model, including intrinsic and extrins
 Levenberg-Marquardt ultimately solves this minimization problem, and for this demo I've taken the default solver options [from the ceres github library](https://github.com/ceres-solver/ceres-solver/blob/master/examples/bundle_adjuster.cc)
 
 
+## Ring Constraints
+
+To implement a ring constraint
 
 
 
