@@ -36,7 +36,7 @@ You cannot, however, enforce "inequality" constraints this way. You'd need to mo
 Bundle adjustment is an optimization problem at its core, aiming to refine the 3D coordinates of the feature points and the camera parameters by minimizing the reprojection error. The problem can be formulated as a nonlinear least squares problem:
 
 Given:
-- A set of observed feature points in images, $$ \mathbf{x}_{ij} $$, where $$ i $$ indexes the image and $$ j $$ indexes the point.
+- A set of observed feature points in images, $\mathbf{x}_{ij}$, where $i$ indexes the image and $j$ indexes the point.
 - The corresponding 3D coordinates of the feature points in the scene, $ \mathbf{X}_j $.
 - The camera parameters for each image, $ \mathbf{p}_i $, which may include the camera position, orientation, focal length, and lens distortion parameters.
 
