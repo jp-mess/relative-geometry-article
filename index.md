@@ -31,37 +31,59 @@ You cannot, however, enforce "inequality" constraints this way. You'd need to mo
 <br>
 <br>
 
-## Mathematical Formulation of Bundle Adjustment
+## Reprojection Error and Parameter Blocks in Ceres
 
-Bundle adjustment is an optimization problem at its core, aiming to refine the 3D coordinates of the feature points and the camera parameters by minimizing the reprojection error. The problem can be formulated as a nonlinear least squares problem:
+I assume the reader is familiar with textbook Bundle Adjustment and nonlinear least-squares. I've added a section here which goes over how to build a cost function and set parameter blocks in ceres, since these are the things that will be modified to implement geometry constraints.
 
-Given:
-- A set of observed feature points in images, $\mathbf{x}_{ij}$, where $i$ indexes the image and $j$ indexes the point.
-- The corresponding 3D coordinates of the feature points in the scene, $\mathbf{X}_j$.
-- The camera parameters for each image, $\mathbf{p}_i$, which may include the camera position, orientation, focal length, and lens distortion parameters.
+## Generic Cost Function (Quaternions)
 
-We seek to minimize the sum of squared reprojection errors across all feature points and all images:
+```bash
+ template <typename T>
+  bool operator()(const T* const extrinsic_params, // Camera parameters
+                  const T* const intrinsic_params, // frozen intrinsics
+                  const T* const point,  // 3D point
+                  T* residuals) const {
 
-$$
-\min_{\mathbf{X}, \mathbf{p}} \sum_{i=1}^{n} \sum_{j=1}^{m} \rho \left( \mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i) \right)
-$$
+    // Camera parameters: quaternion (4), translation (3), intrinsics (3)
+    const T* quaternion = extrinsic_params;
+    const T* translation = extrinsic_params + 4;
+    const T* intrinsics = intrinsic_params;
 
-where:
-- $\mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i)$ is the reprojection error for feature point $j$ in image $i$.
-- $\rho$ is a robust cost function, such as the Huber loss, which reduces the influence of outliers.
-- $n$ is the number of images.
-- $m$ is the number of feature points.
+    // Conjugate of the quaternion for inverse rotation.
+    // Eigen uses x,y,z,w format when loading in quaternions this way (it's the API that is wrong)
+    T conjugate_quaternion[4] = {quaternion[0], 
+                                 -quaternion[1], 
+                                 -quaternion[2], 
+                                 -quaternion[3]};
 
-The reprojection error $\mathbf{r}\_{ij}$ is defined as the difference between the observed feature point location $\mathbf{x}\_{ij}$ and the projected location of the 3D point $\mathbf{X}\_j$ using the camera parameters $\mathbf{p}\_i$:
+    // Apply inverse translation: point - translation.
+    T translated_point[3] = {point[0] - translation[0],
+                             point[1] - translation[1],
+                             point[2] - translation[2]};
 
 
-$$
-\mathbf{r}\_{ij}(\mathbf{X}\_j, \mathbf{p}\_i) = \mathbf{x}\_{ij} - \text{project}(\mathbf{X}\_j, \mathbf{p}\_i)
-$$
+    // Rotate the translated point using the conjugate of the camera quaternion.
+    T rotated_translated_point[3];
+    ceres::QuaternionRotatePoint(conjugate_quaternion, translated_point, rotated_translated_point);
 
-The `project` function applies the camera model, including intrinsic and extrinsic parameters, to map 3D points to 2D image coordinates.
+    // Project the 3D point onto the 2D camera plane.
+    const T& focal = intrinsics[0];
+    const T& cx = intrinsics[1];
+    const T& cy = intrinsics[2];
 
-Levenberg-Marquardt ultimately solves this minimization problem, and for this demo I've taken the default solver options [from the ceres github library](https://github.com/ceres-solver/ceres-solver/blob/master/examples/bundle_adjuster.cc)
+    const T kEpsilon = T(1e-4);
+    const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
+    const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
+
+    const T predicted_x = focal * xp + cx;
+    const T predicted_y = focal * yp + cy;
+
+    // The error is the difference between the predicted and observed positions.
+    residuals[0] = predicted_x - observed_x;
+    residuals[1] = predicted_y - observed_y;
+
+```
+
 
 
 ## Ring Constraints
