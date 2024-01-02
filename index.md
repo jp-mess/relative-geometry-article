@@ -56,7 +56,7 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 
 ## Some basic parameter blocks
 
-```bash
+```cpp
 for (int i = 0; i < quat_problem.num_observations(); ++i) {
         ceres::CostFunction* cost_function = QuatCost::Create(
             observations[2 * i + 0], observations[2 * i + 1]);
@@ -83,7 +83,7 @@ for (int i = 0; i < quat_problem.num_observations(); ++i) {
 
 A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error.
 
-```bash
+```cpp
  template <typename T>
   bool operator()(const T* const extrinsic_params, // Camera parameters
                   const T* const intrinsic_params, // frozen intrinsics
@@ -129,11 +129,9 @@ A reminder that the pose matrix of a camera rotates a point from the camera's op
     residuals[1] = predicted_y - observed_y;
 
 ```
-
-
-
 <br>
 <br>
+
 
 # Ring Constraints
 
