@@ -57,28 +57,32 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 
 ## Some basic parameter blocks
 
-```cpp
-for (int i = 0; i < quat_problem.num_observations(); ++i) {
-        ceres::CostFunction* cost_function = QuatCost::Create(
-            observations[2 * i + 0], observations[2 * i + 1]);
+<details>
+  <summary>Click to expand/collapse the C++ code</summary>
 
-        // Get the entire camera parameter block (which includes quaternion, translation, and intrinsics)
-        double* extrinsics = quat_problem.mutable_extrinsic_for_observation(i);
-        double* intrinsics = quat_problem.mutable_intrinsic_for_observation(i);
-        double* point = quat_problem.mutable_point_for_observation(i);
-
-
-        ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::QuaternionManifold, ceres::EuclideanManifold<3>>{};
-
-        problem.AddParameterBlock(intrinsics, 3);
-        problem.SetParameterBlockConstant(intrinsics);
-
-        problem.AddParameterBlock(extrinsics, 7, camera_manifold);
-
-        // Add the residual block to the problem.
-        problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
-
-```
+  ```cpp
+  for (int i = 0; i < quat_problem.num_observations(); ++i) {
+          ceres::CostFunction* cost_function = QuatCost::Create(
+              observations[2 * i + 0], observations[2 * i + 1]);
+  
+          // Get the entire camera parameter block (which includes quaternion, translation, and intrinsics)
+          double* extrinsics = quat_problem.mutable_extrinsic_for_observation(i);
+          double* intrinsics = quat_problem.mutable_intrinsic_for_observation(i);
+          double* point = quat_problem.mutable_point_for_observation(i);
+  
+  
+          ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::QuaternionManifold, ceres::EuclideanManifold<3>>{};
+  
+          problem.AddParameterBlock(intrinsics, 3);
+          problem.SetParameterBlockConstant(intrinsics);
+  
+          problem.AddParameterBlock(extrinsics, 7, camera_manifold);
+  
+          // Add the residual block to the problem.
+          problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
+  
+  ```
+</details>
 
 <br>
 
