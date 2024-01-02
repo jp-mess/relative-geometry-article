@@ -13,9 +13,8 @@ title: Geometric Priors in Ceres
   <img src="diagrams/intro_car.png" alt="Intro Car"/>
 </p>
 
+<br>
 
-<br>
-<br>
 
 # What is a geometric prior?
 
