@@ -54,6 +54,8 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
   <img src="diagrams/camera_params.jpg" alt="Camera Parameters"/>
 </p>
 
+<br>
+
 ## Some basic parameter blocks
 
 ```cpp
@@ -137,6 +139,63 @@ A reminder that the pose matrix of a camera rotates a point from the camera's op
 
 To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error.
 
+<br>
+
+<p align="center">
+  <img src="diagrams/ring_params.jpg" alt="Ring Parameters"/>
+</p>
+
+<br>
+
+The full 3D x,y,z point in each camera is replaced by a single $\theta$ parameter, because each camera's 3D position can be reduced to just the anlge at which it lives on the ring. This means we have to update our code to include functions that project 3D points to the ring, and vice versa. 
+
+## Projecting a 3D point to a ring
+
+This will be used to initialize the problem (we want to project our initial 3D points onto a ring, so that we can change the parameter blocks).
+
+```cpp
+double ProjectPointOntoRing(const Eigen::Vector3d& point, 
+                            const Eigen::Vector3d& center, 
+                            const Eigen::Quaterniond& ring_orientation) {
+    // Step 1: Translate the point to the ring's coordinate system
+    Eigen::Vector3d translated_point = point - center;
+
+    // Step 2: Rotate the translated point to align with the ring's local coordinate system
+    // Inverse rotation is used to bring the point into the ring's coordinate frame
+    Eigen::Quaterniond inverse_orientation = ring_orientation.conjugate();
+    Eigen::Vector3d aligned_point = inverse_orientation * translated_point;
+
+    // Step 3: Since the ring lies in the XY plane of its local coordinate system,
+    // the Z-component of aligned_point can be ignored for theta calculation.
+    // Compute the angle between the X-axis and the projected point in the XY plane
+    double theta = atan2(aligned_point.y(), aligned_point.x());
+
+    return theta;
+}
+```
+
+## Converting a $\theta$ back to a 3D point
+
+I've made this one templated because it actually has to be used in the ceres cost function (ceres will guess a $\theta$, then to take a reprojection error, we need to extract the pose matrix).
+
+```cpp
+template <typename T>
+Eigen::Matrix<T, 3, 1> ThetaTo3DPoint(const T& theta, 
+                                      const Eigen::Matrix<T, 3, 1>& center, 
+                                      const Eigen::Quaternion<T>& ring_orientation, 
+                                      const T& radius) {
+    // Step 1: Calculate the point's position in the ring's local XY plane
+    Eigen::Matrix<T, 3, 1> point_in_plane(radius * cos(theta), radius * sin(theta), T(0));
+
+    // Step 2: Rotate the point from the ring's local coordinate system to the global coordinate system
+    Eigen::Matrix<T, 3, 1> point_in_global_space = ring_orientation * point_in_plane;
+
+    // Step 3: Translate the point by the ring's center to get its position in the original coordinate system
+    Eigen::Matrix<T, 3, 1> point_in_original_space = point_in_global_space + center;
+
+    return point_in_original_space;
+}
+```
 
 
 
