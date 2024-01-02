@@ -154,7 +154,7 @@ To implement ring constraints, we don't need to adjust the cost function at all.
 <br>
 
 
-## Projecting a 3D point to a $\theta$ angle on the ring
+## Projecting a 3D point to a theta angle on the ring
 
 This will be used to initialize the problem (we want to project our initial 3D points onto a ring, so that we can change the parameter blocks).
 
