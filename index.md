@@ -102,7 +102,7 @@ for (int i = 0; i < quat_problem.num_observations(); ++i) {
         problem.AddParameterBlock(intrinsics, 3);
         problem.SetParameterBlockConstant(intrinsics);
 
-        problem.AddParameterBlock(extrinsics, 7, camera_manifold); // assuming camera has 7 parameters (4 for quaternion, 3 for translation)
+        problem.AddParameterBlock(extrinsics, 7, camera_manifold);
 
         // Add the residual block to the problem.
         problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
