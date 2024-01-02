@@ -1,5 +1,5 @@
 ---
-title: Geometric Constraints in Ceres
+title: Geometric Priors in Ceres
 ---
 
 ### [Author: John (Jack) Messerly](https://www.linkedin.com/in/jack-messerly-567b9b96/)
@@ -17,9 +17,9 @@ title: Geometric Constraints in Ceres
 <br>
 <br>
 
-# What is a geometric constraint?
+# What is a geometric prior?
 
-Structure-from-motion is the most commonly used pipeline for creating 3D models from 2D images. Image feature-matches are fed into an optimization algorithm known as Bundle Adjustment, which simultaneously estimates the positions of the cameras, as well as a 3D point cloud of all the matched pixels. I assume if the reader has found this page, they know that much. The diagram at the top of this page depicts the entire output of Bundle Adjustment, with the estimated position of 6 cameras, as well as the reconstructed object (a red car). Each camera in this simulation has a focal length of 525, and an image dimension of 600x600. Below are six images, rendered from each camera's orientation. The green lines indicate the camera's viewing direction.
+**The briefest review of 3D computer vision:** Structure-from-motion is the most commonly used pipeline for creating 3D models from 2D images. Image feature-matches are fed into an optimization algorithm known as Bundle Adjustment, which simultaneously estimates the positions of the cameras, as well as a 3D point cloud of all the matched pixels. I assume if the reader has found this page, they know that much. The diagram at the top of this page depicts the entire output of Bundle Adjustment, with the estimated position of 6 cameras, as well as the reconstructed object (a red car). Each camera in this simulation has a focal length of 525, and an image dimension of 600x600. Below are six images, rendered from each camera's orientation. The green lines indicate the camera's viewing direction.
 
 <br>
 
@@ -30,7 +30,7 @@ Structure-from-motion is the most commonly used pipeline for creating 3D models 
 <br>
 
 
-What if we know (beforehand) that all the cameras in this system lie on a ring, like in the diagram above? This is what I would call a "geometric prior", and in real-world applications this is a common scenario because the cameras will be on some sort of rig (or robot). Can we use these assumptions to make the optimization more efficient? The answer is yes, and it isn't difficult to setup in ceres. Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization, and it generally makes the optimization more efficient if you have a reasonable prior estimate of that geometry (i.e. you know the ring should be roughly horizontal and above the car, not below it). Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
+**Geometric Priors:** What if we know (beforehand) that all the cameras in this system lie on a ring, like in the diagram above? This is what I would call a "geometric prior", and in real-world applications this is a common scenario because the cameras will be on some sort of rig (or robot). It could also be called a "geometric constraint", but that would imply it makes the optimization more difficult, when in reality it makes it easier. Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization, and it generally makes the optimization more efficient if you have a reasonable prior estimate of that geometry (i.e. you know the ring should be roughly horizontal and above the car, not below it). Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
 
 1. Planes, lines, or other geometric shapes with a small number of parameters
 2. Relative distances (enforce all cameras to be the same distance away)
