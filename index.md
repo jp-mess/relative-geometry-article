@@ -154,7 +154,7 @@ To implement ring constraints, we don't need to adjust the cost function at all.
 <br>
 
 
-## Projecting a 3D point to a theta angle on the ring
+## Projecting a 3D point to an angle on the ring
 
 This will be used to initialize the problem (we want to project our initial 3D points onto a ring, so that we can change the parameter blocks).
 
@@ -179,7 +179,7 @@ double ProjectPointOntoRing(const Eigen::Vector3d& point,
 }
 ```
 
-## Converting a theta angle back to a 3D point
+## Converting an angle back to a 3D point
 
 I've made this one templated because it actually has to be used in the ceres cost function (ceres will guess a `theta`, then to take a reprojection error, we need to extract the pose matrix).
 
