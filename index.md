@@ -59,27 +59,25 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 
 
 ```cpp
-      for (int i = 0; i < quat_problem.num_observations(); ++i) {
-          ceres::CostFunction* cost_function = QuatCost::Create(
-              observations[2 * i + 0], observations[2 * i + 1]);
+for (int i = 0; i < quat_problem.num_observations(); ++i) {
+  ceres::CostFunction* cost_function = QuatCost::Create(observations[2 * i + 0], observations[2 * i + 1]);
   
-          // Get the entire camera parameter block (which includes quaternion, translation, and intrinsics)
-          double* extrinsics = quat_problem.mutable_extrinsic_for_observation(i);
-          double* intrinsics = quat_problem.mutable_intrinsic_for_observation(i);
-          double* point = quat_problem.mutable_point_for_observation(i);
-  
-  
-          ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::QuaternionManifold, ceres::EuclideanManifold<3>>{};
-  
-          problem.AddParameterBlock(intrinsics, 3);
-          problem.SetParameterBlockConstant(intrinsics);
-  
-          problem.AddParameterBlock(extrinsics, 7, camera_manifold);
-  
-          // Add the residual block to the problem.
-          problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
-      }
-  ```
+  // Get the entire camera parameter block (which includes quaternion, translation, and intrinsics)
+  double* extrinsics = quat_problem.mutable_extrinsic_for_observation(i);
+  double* intrinsics = quat_problem.mutable_intrinsic_for_observation(i);
+  double* point = quat_problem.mutable_point_for_observation(i);
+
+  ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::QuaternionManifold, ceres::EuclideanManifold<3>>{};
+
+  problem.AddParameterBlock(intrinsics, 3);
+  problem.SetParameterBlockConstant(intrinsics);
+
+  problem.AddParameterBlock(extrinsics, 7, camera_manifold);
+
+  // Add the residual block to the problem.
+  problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
+}
+```
 
 <br>
 
@@ -88,51 +86,52 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error.
 
 ```cpp
- template <typename T>
-  bool operator()(const T* const extrinsic_params, // Camera parameters
-                  const T* const intrinsic_params, // frozen intrinsics
-                  const T* const point,  // 3D point
-                  T* residuals) const {
+template <typename T>
+bool operator()(const T* const extrinsic_params, // Camera parameters
+                const T* const intrinsic_params, // frozen intrinsics
+                const T* const point,  // 3D point
+                T* residuals) const {
 
-    // Camera parameters: quaternion (4), translation (3), intrinsics (3)
-    const T* quaternion = extrinsic_params;
-    const T* translation = extrinsic_params + 4;
-    const T* intrinsics = intrinsic_params;
+  // Camera parameters: quaternion (4), translation (3), intrinsics (3)
+  const T* quaternion = extrinsic_params;
+  const T* translation = extrinsic_params + 4;
+  const T* intrinsics = intrinsic_params;
 
-    // Conjugate of the quaternion for inverse rotation.
-    // Eigen uses x,y,z,w format when loading in quaternions this way
-    T conjugate_quaternion[4] = {quaternion[0], 
-                                 -quaternion[1], 
-                                 -quaternion[2], 
-                                 -quaternion[3]};
+  // Conjugate of the quaternion for inverse rotation.
+  // Eigen uses x,y,z,w format when loading in quaternions this way
+  T conjugate_quaternion[4] = {quaternion[0], 
+                               -quaternion[1], 
+                               -quaternion[2], 
+                               -quaternion[3]};
 
-    // Apply inverse translation: point - translation.
-    T translated_point[3] = {point[0] - translation[0],
-                             point[1] - translation[1],
-                             point[2] - translation[2]};
+  // Apply inverse translation: point - translation.
+  T translated_point[3] = {point[0] - translation[0],
+                           point[1] - translation[1],
+                           point[2] - translation[2]};
 
 
-    // Rotate the translated point using the conjugate of the camera quaternion.
-    T rotated_translated_point[3];
-    ceres::QuaternionRotatePoint(conjugate_quaternion, translated_point, rotated_translated_point);
+  // Rotate the translated point using the conjugate of the camera quaternion.
+  T rotated_translated_point[3];
+  ceres::QuaternionRotatePoint(conjugate_quaternion, translated_point, rotated_translated_point);
 
-    // Project the 3D point onto the 2D camera plane.
-    const T& focal = intrinsics[0];
-    const T& cx = intrinsics[1];
-    const T& cy = intrinsics[2];
+  // Project the 3D point onto the 2D camera plane.
+  const T& focal = intrinsics[0];
+  const T& cx = intrinsics[1];
+  const T& cy = intrinsics[2];
 
-    const T kEpsilon = T(1e-4);
-    const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
-    const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
+  const T kEpsilon = T(1e-4);
+  const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
+  const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
 
-    const T predicted_x = focal * xp + cx;
-    const T predicted_y = focal * yp + cy;
+  const T predicted_x = focal * xp + cx;
+  const T predicted_y = focal * yp + cy;
 
-    // The error is the difference between the predicted and observed positions.
-    residuals[0] = predicted_x - observed_x;
-    residuals[1] = predicted_y - observed_y;
-
+  // The error is the difference between the predicted and observed positions.
+  residuals[0] = predicted_x - observed_x;
+  residuals[1] = predicted_y - observed_y;
+}
 ```
+
 <br>
 <br>
 
@@ -211,33 +210,33 @@ Eigen::Matrix<T, 3, 1> ThetaTo3DPoint(const T& theta,
 ## Updated parameter blocks for the ring
 
 ```cpp
- for (int i = 0; i < ring_problem.num_observations(); ++i) {
-        ceres::CostFunction* cost_function = RingCost::Create(
-            observations[2 * i + 0], observations[2 * i + 1]);
+for (int i = 0; i < ring_problem.num_observations(); ++i) {
+    ceres::CostFunction* cost_function = RingCost::Create(
+        observations[2 * i + 0], observations[2 * i + 1]);
 
-        // Get camera parameters and point for this observation
-        double* extrinsics = ring_problem.mutable_extrinsic_for_observation(i);
-        double* intrinsics = ring_problem.mutable_intrinsic_for_observation(i);
-        double* point = ring_problem.mutable_point_for_observation(i);
-        double* geometry = ring_problem.mutable_geometry_params();
+    // Get camera parameters and point for this observation
+    double* extrinsics = ring_problem.mutable_extrinsic_for_observation(i);
+    double* intrinsics = ring_problem.mutable_intrinsic_for_observation(i);
+    double* point = ring_problem.mutable_point_for_observation(i);
+    double* geometry = ring_problem.mutable_geometry_params();
 
-        // Use a product manifold of AngleManifold (for theta) and QuaternionManifold (for the quaternion)
-        ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::AutoDiffManifold<AngleManifold, 1, 1>, ceres::QuaternionManifold>{};
+    // Use a product manifold of AngleManifold (for theta) and QuaternionManifold (for the quaternion)
+    ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::AutoDiffManifold<AngleManifold, 1, 1>, ceres::QuaternionManifold>{};
 
-        problem.AddParameterBlock(intrinsics, 3);
-        problem.SetParameterBlockConstant(intrinsics);
+    problem.AddParameterBlock(intrinsics, 3);
+    problem.SetParameterBlockConstant(intrinsics);
 
-        ceres::Manifold* ring_manifold = new ceres::ProductManifold<ceres::EuclideanManifold<3>, ceres::QuaternionManifold, ceres::EuclideanManifold<1>>{};
+    ceres::Manifold* ring_manifold = new ceres::ProductManifold<ceres::EuclideanManifold<3>, ceres::QuaternionManifold, ceres::EuclideanManifold<1>>{};
 
-        problem.AddParameterBlock(geometry, 8, ring_manifold);
+    problem.AddParameterBlock(geometry, 8, ring_manifold);
 
-        // Assuming camera has 5 parameters (1 for theta, 4 for quaternion)
-        // problem.AddParameterBlock(extrinsics, 5, camera_manifold);
-        problem.AddParameterBlock(extrinsics, 5);
+    // Assuming camera has 5 parameters (1 for theta, 4 for quaternion)
+    // problem.AddParameterBlock(extrinsics, 5, camera_manifold);
+    problem.AddParameterBlock(extrinsics, 5);
 
-        // Add the residual block to the problem
-        problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point, geometry);
-    }
+    // Add the residual block to the problem
+    problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point, geometry);
+}
 ```
 
 <br>
@@ -245,54 +244,55 @@ Eigen::Matrix<T, 3, 1> ThetaTo3DPoint(const T& theta,
 ## A ring coordinate reprojection error function
 
 ```cpp
-  // Camera parameters: quaternion (4), theta (1), intrinsics (3)
-        const T* camera_quaternion = extrinsic_params;
-        const T& theta = extrinsic_params[4];  // Theta is the fifth parameter
-        const T* intrinsics = intrinsic_params;
+// Camera parameters: quaternion (4), theta (1), intrinsics (3)
+const T* camera_quaternion = extrinsic_params;
+const T& theta = extrinsic_params[4];  // Theta is the fifth parameter
+const T* intrinsics = intrinsic_params;
 
-        // Conjugate of the camera quaternion for inverse rotation.
-        T conjugate_camera_quaternion[4] = {camera_quaternion[0], 
-                                            -camera_quaternion[1], 
-                                            -camera_quaternion[2], 
-                                            -camera_quaternion[3]};
- 
-        // Extract the ring parameters: center (3), orientation quaternion (4), radius (1)
-        Eigen::Matrix<T, 3, 1> center;
-        Eigen::Quaternion<T> ring_orientation;
-        center << ring_params[0], ring_params[1], ring_params[2];
-        // Eigen uses x,y,z,w format when loading in quaternions this way (it's the API that is wrong)
-        ring_orientation.coeffs() << ring_params[3], ring_params[4], ring_params[5], ring_params[6];
-        const T& radius = ring_params[7];
+// Conjugate of the camera quaternion for inverse rotation.
+T conjugate_camera_quaternion[4] = {camera_quaternion[0], 
+                                    -camera_quaternion[1], 
+                                    -camera_quaternion[2], 
+                                    -camera_quaternion[3]};
 
-        // Convert theta back to translation
-        Eigen::Matrix<T, 3, 1> translation = ThetaTo3DPoint(theta, center, ring_orientation, radius);
+// Extract the ring parameters: center (3), orientation quaternion (4), radius (1)
+Eigen::Matrix<T, 3, 1> center;
+Eigen::Quaternion<T> ring_orientation;
+center << ring_params[0], ring_params[1], ring_params[2];
+// Eigen uses x,y,z,w format when loading in quaternions this way (it's the API that is wrong)
+ring_orientation.coeffs() << ring_params[3], ring_params[4], ring_params[5], ring_params[6];
+const T& radius = ring_params[7];
 
-        // Apply inverse translation: point - translation.
-        T translated_point[3] = {point[0] - translation[0],
-                                point[1] - translation[1],
-                                point[2] - translation[2]};
+// Convert theta back to translation
+Eigen::Matrix<T, 3, 1> translation = ThetaTo3DPoint(theta, center, ring_orientation, radius);
 
-        // Rotate the translated point using the conjugate of the camera quaternion.
-        T rotated_translated_point[3];
-        ceres::QuaternionRotatePoint(conjugate_camera_quaternion, translated_point, rotated_translated_point);
+// Apply inverse translation: point - translation.
+T translated_point[3] = {point[0] - translation[0],
+                         point[1] - translation[1],
+                         point[2] - translation[2]};
 
-        // Project the 3D point onto the 2D camera plane.
-        const T& focal = intrinsics[0];
-        const T& cx = intrinsics[1];
-        const T& cy = intrinsics[2];
+// Rotate the translated point using the conjugate of the camera quaternion.
+T rotated_translated_point[3];
+ceres::QuaternionRotatePoint(conjugate_camera_quaternion, translated_point, rotated_translated_point);
 
-        const T kEpsilon = T(1e-4);
-        const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
-        const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
+// Project the 3D point onto the 2D camera plane.
+const T& focal = intrinsics[0];
+const T& cx = intrinsics[1];
+const T& cy = intrinsics[2];
 
-        const T predicted_x = focal * xp + cx;
-        const T predicted_y = focal * yp + cy;
+const T kEpsilon = T(1e-4);
+const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
+const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
 
-        // The error is the difference between the predicted and observed positions.
-        residuals[0] = predicted_x - observed_x;
-        residuals[1] = predicted_y - observed_y;
+const T predicted_x = focal * xp + cx;
+const T predicted_y = focal * yp + cy;
 
-        return true;
+// The error is the difference between the predicted and observed positions.
+residuals[0] = predicted_x - observed_x;
+residuals[1] = predicted_y - observed_y;
+
+return true;
+
 ```
 
 
