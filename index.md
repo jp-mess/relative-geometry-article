@@ -52,9 +52,10 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
   <img src="diagrams/camera_params.jpg" alt="Camera Parameters"/>
 </p>
 
- A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error. I've used manifold for angular quantities.
 
 ## A Vanilla Cost Function
+
+A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error.
 
 ```bash
  template <typename T>
