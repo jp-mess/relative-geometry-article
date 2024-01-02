@@ -43,7 +43,7 @@ Below is a visualization of what this means; in addition to the rough positions 
 <br>
 <br>
 
-# Setting Up A Basic Bundle Adjustment Problem
+# Setting up a basic bundle adjustment problem
 
 I assume the reader is familiar with textbook Bundle Adjustment and nonlinear least-squares. I've added a section here which goes over how to build a cost function and set parameter blocks in ceres, since these are the things that will be modified to implement geometry constraints. Ceres will store the parameters you want to estimate in "parameter blocks", which are pointers to contiguous places in memory where those parameters are. I've illustrated the parameter block for the extrinsic parameters in the system. In thoe code, I've added these as a `camera_manifold`, so that the quaternions can be estimated more efficiently. The world points are in a secondary block, and the intrinsic parameters are in a third. You can see in the code that I've frozen the intrinsic parameters.
 
@@ -136,7 +136,7 @@ A reminder that the pose matrix of a camera rotates a point from the camera's op
 <br>
 
 
-# Ring Constraints
+# Adding in a "ring" geometric prior
 
 To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error. The full 3D x,y,z point in each camera is replaced by a single `theta` parameter, because each camera's 3D position can be reduced to the angle at which it lives on the ring. This means we have to update our code to include functions that project 3D points to the ring, and vice versa. 
 
