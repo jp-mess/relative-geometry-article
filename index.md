@@ -142,13 +142,13 @@ To implement ring constraints, we don't need to adjust the cost function at all.
 <br>
 
 <p align="center">
-  <img src="diagrams/ring_camera_params.jpg" alt="Ring + Camera Parameters"/>
+  <img src="diagrams/ring_camera_params.jpg" alt="Ring + Camera Parameters" style="width: 85%; height: auto;"/>
 </p>
 
 <br>
 
 <p align="center">
-  <img src="diagrams/ring_params.jpg" alt="Ring Parameters"/>
+  <img src="diagrams/ring_params.jpg" alt="Ring Parameters" style="width: 85%; height: auto;"/>
 </p>
 
 <br>
