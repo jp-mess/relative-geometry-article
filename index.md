@@ -34,7 +34,11 @@ What if we know (beforehand) that all the cameras in this system lie on a ring, 
 1. Planes, lines, or other geometric shapes with a small number of parameters
 2. Relative distances (enforce all cameras to be the same distance away)
 
-You cannot, however, enforce "inequality" constraints this way. You'd need to modify the optimizer itself for that, which is not easy in ceres. This writeup does not introduce any newfound algorithm, but tries to quantify and document the effectiveness of this approach, and gives the reader some easy-to-setup C++ simulations so they can try it themselves.
+Below is a visualization of what this means; in addition to the rough positions of the cameras, we have a rough idea of what kind of ring the cameras will fall on. Bundle Adjustment can solve for both simultaneously.
+
+<p align="center">
+  <img src="diagrams/optimization_with_geometric_constraints.png" alt="Optimization with Geometric Constraints"/>
+</p>
 
 <br>
 <br>
@@ -122,9 +126,6 @@ for (int i = 0; i < quat_problem.num_observations(); ++i) {
 
 # Ring Constraints
 
-<p align="center">
-  <img src="diagrams/optimization_with_geometric_constraints.png" alt="Optimization with Geometric Constraints"/>
-</p>
 
 
 
