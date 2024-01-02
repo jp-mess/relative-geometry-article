@@ -1,5 +1,5 @@
 ---
-title: Geometry Constraints in Ceres
+title: Geometric Constraints in Ceres
 ---
 
 ### [Author: John (Jack) Messerly](https://www.linkedin.com/in/jack-messerly-567b9b96/)
