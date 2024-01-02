@@ -47,13 +47,13 @@ $$
 $$
 
 where:
-
 - $\mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i)$ is the reprojection error for feature point $j$ in image $i$.
 - $\rho$ is a robust cost function, such as the Huber loss, which reduces the influence of outliers.
 - $n$ is the number of images.
 - $m$ is the number of feature points.
 
-The reprojection error $\mathbf{r}_{ij}$ is defined as the difference between the observed feature point location $\mathbf{x}_{ij}$ and the projected location of the 3D point $\mathbf{X}_j$ using the camera parameters $ \mathbf{p}_i $:
+The reprojection error $\mathbf{r}\_{ij}$ is defined as the difference between the observed feature point location $\mathbf{x}\_{ij}$ and the projected location of the 3D point $\mathbf{X}\_j$ using the camera parameters $\mathbf{p}\_i$:
+
 
 $$
 \mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i) = \mathbf{x}_{ij} - \text{project}(\mathbf{X}_j, \mathbf{p}_i)
