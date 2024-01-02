@@ -61,7 +61,7 @@ $$
 
 The `project` function applies the camera model, including intrinsic and extrinsic parameters, to map 3D points to 2D image coordinates.
 
-The Levenberg-Marquardt algorithm is often used to solve this optimization problem due to its effectiveness in dealing with nonlinear least squares.
+Levenberg-Marquardt ultimately solves this minimization problem, and for this demo I've taken the default solver options [from the ceres github library](https://github.com/ceres-solver/ceres-solver/blob/master/examples/bundle_adjuster.cc)
 
 
 
