@@ -2,7 +2,12 @@
 title: Geometry Constraints in Ceres
 ---
 
+### [Author: John (Jack) Messerly](https://www.linkedin.com/in/jack-messerly-567b9b96/)
+
+### [show me the code!](https://github.com/jp-mess/ceres-geometric-constraints)
+
 <br>
+<br>  
 
 <p align="center">
   <img src="diagrams/intro_car.png" alt="Intro Car"/>
