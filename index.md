@@ -38,7 +38,7 @@ title: Geometric Priors in Ceres
 Below is a visualization of what this means; in addition to the rough positions of the cameras, we have a rough idea of what kind of ring the cameras will fall on. Bundle Adjustment can solve for both simultaneously.
 
 <p align="center">
-  <img src="diagrams/optimization_with_geometric_constraints.png" alt="Optimization with Geometric Constraints"/>
+  <img src="diagrams/optimization_with_prior.png" alt="Optimization with Geometric Constraints"/>
 </p>
 
 <br>
