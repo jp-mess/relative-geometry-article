@@ -56,7 +56,7 @@ The reprojection error $\mathbf{r}\_{ij}$ is defined as the difference between t
 
 
 $$
-\mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i) = \mathbf{x}_{ij} - \text{project}(\mathbf{X}_j, \mathbf{p}_i)
+\mathbf{r}\_{ij}(\mathbf{X}\_j, \mathbf{p}\_i) = \mathbf{x}\_{ij} - \text{project}(\mathbf{X}\_j, \mathbf{p}\_i)
 $$
 
 The `project` function applies the camera model, including intrinsic and extrinsic parameters, to map 3D points to 2D image coordinates.
