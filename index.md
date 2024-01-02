@@ -2,6 +2,8 @@
 title: Relative Geometry Constraints in Ceres
 ---
 
+<br>
+
 <p align="center">
   <img src="diagrams/intro_car_side.png" alt="intro car side image"/>
 </p>
