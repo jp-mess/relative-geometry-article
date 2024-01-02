@@ -137,7 +137,7 @@ A reminder that the pose matrix of a camera rotates a point from the camera's op
 
 # Ring Constraints
 
-To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error.
+To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error. The full 3D x,y,z point in each camera is replaced by a single $\theta$ parameter, because each camera's 3D position can be reduced to just the anlge at which it lives on the ring. This means we have to update our code to include functions that project 3D points to the ring, and vice versa. 
 
 <br>
 
@@ -147,7 +147,6 @@ To implement ring constraints, we don't need to adjust the cost function at all.
 
 <br>
 
-The full 3D x,y,z point in each camera is replaced by a single $\theta$ parameter, because each camera's 3D position can be reduced to just the anlge at which it lives on the ring. This means we have to update our code to include functions that project 3D points to the ring, and vice versa. 
 
 ## Projecting a 3D point to a $\theta$ angle on the ring
 
