@@ -43,8 +43,9 @@ Below is a visualization of what this means; in addition to the rough positions 
 
 <br>
 <br>
+<br>
 
-# Reprojection Error and Parameter Blocks in Ceres
+# Setting Up A Basic Ceres Problem
 
 I assume the reader is familiar with textbook Bundle Adjustment and nonlinear least-squares. I've added a section here which goes over how to build a cost function and set parameter blocks in ceres, since these are the things that will be modified to implement geometry constraints. Ceres will store the parameters you want to estimate in "parameter blocks", which are pointers to contiguous places in memory where those parameters are. I've illustrated the parameter block for the extrinsic parameters in the system. In thoe code, I've added these as a `camera_manifold`, so that the quaternions can be estimated more efficiently. The world points are in a secondary block, and the intrinsic parameters are in a third. You can see in the code that I've frozen the intrinsic parameters.
 
