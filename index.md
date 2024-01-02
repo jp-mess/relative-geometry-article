@@ -1,12 +1,13 @@
 ---
-title: Relative Geometry Constraints in Ceres
+title: Geometry Constraints in Ceres
 ---
 
 <br>
 
 <p align="center">
-  <img src="diagrams/optimization_with_geometric_constraints.png" alt="Optimization with Geometric Constraints"/>
+  <img src="diagrams/intro_car_side.png" alt="Intro Car"/>
 </p>
+
 
 <br>
 <br>
@@ -22,7 +23,8 @@ Structure-from-motion is the most commonly used pipeline for creating 3D models 
 
 <br>
 
-You'll notice that the cameras in this picture are all in a ring. Indeed, they were sampled that way. If I had known that they would fall in a ring before my optimization, could I have made my optimization more efficient? The answer is yes, and it isn't difficult to setup in ceres, because they are all "relative geometry constraints". Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization, and it generally makes the optimization more efficient if you have a reasonable prior estimate of that geometry (i.e. you know the ring should be roughly horizontal and above the car, not below it). Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
+
+What if we know (beforehand) that all the cameras in this system lie on a ring, or a plane? This is what I would call a "geometric prior". Could I have made my optimization more efficient? The answer is yes, and it isn't difficult to setup in ceres, because they are all "relative geometry constraints". Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization, and it generally makes the optimization more efficient if you have a reasonable prior estimate of that geometry (i.e. you know the ring should be roughly horizontal and above the car, not below it). Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
 
 1. Planes, lines, or other geometric shapes with a small number of parameters
 2. Relative distances (enforce all cameras to be the same distance away)
@@ -114,6 +116,10 @@ for (int i = 0; i < quat_problem.num_observations(); ++i) {
 <br>
 
 # Ring Constraints
+
+<p align="center">
+  <img src="diagrams/optimization_with_geometric_constraints.png" alt="Optimization with Geometric Constraints"/>
+</p>
 
 
 
