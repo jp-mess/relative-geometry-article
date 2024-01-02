@@ -37,8 +37,8 @@ Bundle adjustment is an optimization problem at its core, aiming to refine the 3
 
 Given:
 - A set of observed feature points in images, $\mathbf{x}_{ij}$, where $i$ indexes the image and $j$ indexes the point.
-- The corresponding 3D coordinates of the feature points in the scene, $ \mathbf{X}_j $.
-- The camera parameters for each image, $ \mathbf{p}_i $, which may include the camera position, orientation, focal length, and lens distortion parameters.
+- The corresponding 3D coordinates of the feature points in the scene, $\mathbf{X}_j$.
+- The camera parameters for each image, $\mathbf{p}_i$, which may include the camera position, orientation, focal length, and lens distortion parameters.
 
 We seek to minimize the sum of squared reprojection errors across all feature points and all images:
 
@@ -48,12 +48,12 @@ $$
 
 where:
 
-- $ \mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i) $ is the reprojection error for feature point $ j $ in image $ i $.
-- $ \rho $ is a robust cost function, such as the Huber loss, which reduces the influence of outliers.
-- $ n $ is the number of images.
-- $ m $ is the number of feature points.
+- $\mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i)$ is the reprojection error for feature point $j$ in image $i$.
+- $\rho$ is a robust cost function, such as the Huber loss, which reduces the influence of outliers.
+- $n$ is the number of images.
+- $m$ is the number of feature points.
 
-The reprojection error $ \mathbf{r}_{ij} $ is defined as the difference between the observed feature point location $ \mathbf{x}_{ij} $ and the projected location of the 3D point $ \mathbf{X}_j $ using the camera parameters $ \mathbf{p}_i $:
+The reprojection error $\mathbf{r}_{ij}$ is defined as the difference between the observed feature point location $\mathbf{x}_{ij}$ and the projected location of the 3D point $\mathbf{X}_j$ using the camera parameters $ \mathbf{p}_i $:
 
 $$
 \mathbf{r}_{ij}(\mathbf{X}_j, \mathbf{p}_i) = \mathbf{x}_{ij} - \text{project}(\mathbf{X}_j, \mathbf{p}_i)
