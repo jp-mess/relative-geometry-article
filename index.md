@@ -47,7 +47,7 @@ Below is a visualization of what this means; in addition to the rough positions 
 
 I assume the reader is familiar with textbook Bundle Adjustment and nonlinear least-squares. I've added a section here which goes over how to build a cost function and set parameter blocks in ceres, since these are the things that will be modified to implement geometry constraints. A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error. I've used manifold for angular quantities.
 
-## Generic Cost Function (Quaternions)
+## A Vanilla Cost Function
 
 ```bash
  template <typename T>
@@ -96,7 +96,7 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 
 ```
 
-## Generic BA Parameter Blocks
+## Some Vanilla Parameter Blocks
 
 ```bash
 for (int i = 0; i < quat_problem.num_observations(); ++i) {
