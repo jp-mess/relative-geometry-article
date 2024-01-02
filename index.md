@@ -13,6 +13,11 @@ title: Relative Geometry Constraints in Ceres
 
 Structure-from-motion is the most commonly used pipeline for creating 3D models from 2D images. Image feature-matches are fed into an optimization algorithm known as Bundle Adjustment, which simultaneously estimates the positions of the cameras, as well as a 3D point cloud of all the matched pixels. The diagram at the top of this page depicts the entire output of Bundle Adjustment, with the estimated position of 6 cameras, as well as the reconstructed object (a red car). Each camera in this simulation has a focal length of 525, and an image dimension of 600x600. Below are six images, rendered from each camera's orientation. The green lines indicate the camera's viewing direction.
 
+<p align="center">
+  <img src="diagrams/cars.png" alt="cars image"/>
+</p>
+
+
 You'll notice that the cameras in this picture are all in a ring. Indeed, they were sampled that way. If I had known that they would fall in a ring before my optimization, could I have made my optimization more efficient? The answer is yes, and it isn't difficult to setup in ceres. Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization. Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
 
 1. Planes, lines, or other geometric shapes with a small number of parameters
@@ -21,11 +26,6 @@ You'll notice that the cameras in this picture are all in a ring. Indeed, they w
 You cannot, however, enforce "inequality" constraints this way. You'd need to modify the optimizer itself for that, which is not easy in ceres.
 
 <br>
-
-<p align="center">
-  <img src="diagrams/cars.png" alt="cars image"/>
-</p>
-
 <br>
 
 ## Mathematical Formulation of Bundle Adjustment
