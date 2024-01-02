@@ -5,7 +5,7 @@ title: Geometry Constraints in Ceres
 <br>
 
 <p align="center">
-  <img src="diagrams/intro_car_side.png" alt="Intro Car"/>
+  <img src="diagrams/intro_car.png" alt="Intro Car"/>
 </p>
 
 
