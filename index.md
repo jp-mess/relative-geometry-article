@@ -135,10 +135,7 @@ A reminder that the pose matrix of a camera rotates a point from the camera's op
 
 # Ring Constraints
 
-
-
-
-To implement a ring constraint
+To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error.
 
 
 
