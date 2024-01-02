@@ -59,8 +59,7 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 
 <details>
   <summary>Click to expand/collapse the C++ code</summary>
-
-  ```cpp
+```cpp
   for (int i = 0; i < quat_problem.num_observations(); ++i) {
           ceres::CostFunction* cost_function = QuatCost::Create(
               observations[2 * i + 0], observations[2 * i + 1]);
@@ -80,8 +79,7 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
   
           // Add the residual block to the problem.
           problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
-  
-  ```
+```
 </details>
 
 <br>
