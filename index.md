@@ -81,6 +81,8 @@ for (int i = 0; i < quat_problem.num_observations(); ++i) {
 
 ```
 
+<br>
+
 ## A basic cost function (reprojection error)
 
 A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error.
@@ -152,7 +154,7 @@ To implement ring constraints, we don't need to adjust the cost function at all.
 </p>
 
 <br>
-
+<br>
 
 ## Projecting a 3D point to an angle on the ring
 
@@ -179,6 +181,8 @@ double ProjectPointOntoRing(const Eigen::Vector3d& point,
 }
 ```
 
+<br>
+
 ## Converting an angle back to a 3D point
 
 I've made this one templated because it actually has to be used in the ceres cost function (ceres will guess a `theta`, then to take a reprojection error, we need to extract the pose matrix).
@@ -201,6 +205,8 @@ Eigen::Matrix<T, 3, 1> ThetaTo3DPoint(const T& theta,
     return point_in_original_space;
 }
 ```
+
+<br>
 
 ## Updated parameter blocks for the ring
 
@@ -233,6 +239,8 @@ Eigen::Matrix<T, 3, 1> ThetaTo3DPoint(const T& theta,
         problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point, geometry);
     }
 ```
+
+<br>
 
 ## A ring coordinate reprojection error function
 
