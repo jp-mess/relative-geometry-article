@@ -31,9 +31,9 @@ You cannot, however, enforce "inequality" constraints this way. You'd need to mo
 <br>
 <br>
 
-## Reprojection Error and Parameter Blocks in Ceres
+# Reprojection Error and Parameter Blocks in Ceres
 
-I assume the reader is familiar with textbook Bundle Adjustment and nonlinear least-squares. I've added a section here which goes over how to build a cost function and set parameter blocks in ceres, since these are the things that will be modified to implement geometry constraints.
+I assume the reader is familiar with textbook Bundle Adjustment and nonlinear least-squares. I've added a section here which goes over how to build a cost function and set parameter blocks in ceres, since these are the things that will be modified to implement geometry constraints. A reminder that the pose matrix of a camera rotates a point from the camera's optical frame, to the world frame, so an inverse is needed for reprojection error.
 
 ## Generic Cost Function (Quaternions)
 
@@ -84,9 +84,33 @@ I assume the reader is familiar with textbook Bundle Adjustment and nonlinear le
 
 ```
 
+## Generic BA Parameter Blocks
+
+```bash
+for (int i = 0; i < quat_problem.num_observations(); ++i) {
+        ceres::CostFunction* cost_function = QuatCost::Create(
+            observations[2 * i + 0], observations[2 * i + 1]);
+
+        // Get the entire camera parameter block (which includes quaternion, translation, and intrinsics)
+        double* extrinsics = quat_problem.mutable_extrinsic_for_observation(i);
+        double* intrinsics = quat_problem.mutable_intrinsic_for_observation(i);
+        double* point = quat_problem.mutable_point_for_observation(i);
 
 
-## Ring Constraints
+        ceres::Manifold* camera_manifold = new ceres::ProductManifold<ceres::QuaternionManifold, ceres::EuclideanManifold<3>>{};
+
+        problem.AddParameterBlock(intrinsics, 3);
+        problem.SetParameterBlockConstant(intrinsics);
+
+        problem.AddParameterBlock(extrinsics, 7, camera_manifold); // assuming camera has 7 parameters (4 for quaternion, 3 for translation)
+
+        // Add the residual block to the problem.
+        problem.AddResidualBlock(cost_function, nullptr /* squared loss */, extrinsics, intrinsics, point);
+
+```
+
+
+# Ring Constraints
 
 To implement a ring constraint
 
