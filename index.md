@@ -18,7 +18,7 @@ title: Geometric Priors in Ceres
 
 # What is a geometric prior?
 
-**First, the briefest review of 3D computer vision**: Structure-from-motion is the most commonly used pipeline for creating 3D models from 2D images. In structure-from-motion, images (and their feature matches) are fed into an optimization algorithm known as Bundle Adjustment, which simultaneously estimates the positions of the cameras, as well as a 3D point cloud of all the matched pixels. The diagram at the top of this page depicts the entire output of a simulated Bundle Adjustment, with the estimated position of 6 cameras, as well as the reconstructed object (a red car). Each camera in this simulation has a focal length of 525, and an image dimension of 600x600. The green lines indicate the camera's viewing direction. Below are the 6 images that were taken by these 6 cameras, and then used to reconstruct the car in the above diagram:
+**First, the briefest review of 3D computer vision:** Structure-from-motion is the most commonly used pipeline for creating 3D models from 2D images. In structure-from-motion, images (and their feature matches) are fed into an optimization algorithm known as Bundle Adjustment, which simultaneously estimates the positions of the cameras, as well as a 3D point cloud of all the matched pixels. The diagram at the top of this page depicts the entire output of a simulated Bundle Adjustment, with the estimated position of 6 cameras, as well as the reconstructed object (a red car). Each camera in this simulation has a focal length of 525, and an image dimension of 600x600. The green lines indicate the camera's viewing direction. Below are the 6 images that were taken by these 6 cameras, and then used to reconstruct the car in the above diagram:
 
 <br>
 
