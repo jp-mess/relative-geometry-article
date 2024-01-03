@@ -143,7 +143,7 @@ To implement ring constraints, we don't need to adjust the cost function at all.
 <br>
 
 <p align="center">
-  <img src="diagrams/ring_drawing2.jpg" alt="Ring Drawing" style="width: 85%; height: auto;"/>
+  <img src="diagrams/ring_drawing.jpg" alt="Ring Drawing" style="width: 85%; height: auto;"/>
 </p>
 
 <br>
