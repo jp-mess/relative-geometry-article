@@ -138,7 +138,7 @@ bool operator()(const T* const extrinsic_params, // Camera parameters
 
 # Adding a "ring" geometric prior
 
-To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error. The full 3D [x, y, z] point in each camera is replaced by a single `theta` parameter, because each camera's 3D position can be reduced to the angle at which it lives on the ring. This means we have to update our code to include functions that project 3D points to the ring, and vice versa. Note that each camera still has an orientation (a quaternion) to estimate, we don't get to skip that.
+To implement ring constraints, we don't need to adjust the cost function at all. Instead, we update what's stored in the parameter blocks, and how we take the reprojection error. The full 3D [x, y, z] point in each camera is replaced by a single `theta` parameter, because each camera's 3D position can be reduced to the angle at which it lives on the ring. This means we have to update our code to include functions that project 3D points to the ring, and vice versa. We also add some parameter blocks for the 8 total ring parameters (the ring's center point, its quaternion orientation, and its radius), and estimate those simultaneously with the camera positions (represented by a `theta` for the translation, and a quaternion for the orientation), as well as the 3D world points. In theory, we've reduced our workload. In the above basic example, we had 6 x 10 = 60 total camera parameters, whereas now we have (6 x 5) + 8 = 38 total camera parameters.
 
 <br>
 
