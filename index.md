@@ -318,7 +318,7 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
 1. How good our initial ring estimate is
 2. How good our initial camera estimates are
 
-"Ring" bundle adjustment does better than "basic" bundle adjustment when either the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us.
+"Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us.
 
 
 
