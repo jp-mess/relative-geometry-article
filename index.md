@@ -320,7 +320,7 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
 1. How good our initial ring estimate is
 2. How good our initial camera estimates are
 
-"Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us. I'll attempt to quantify the benefit of using a geometric prior by setting up some simulations that illustrate this point.
+"Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us. I'll attempt to quantify the benefit of using a geometric prior by setting up some simulations that illustrate this point. When I add noise, I refer to adding zero-mean Gaussian noise to all the parameters of either the camera extrinsic parameters, or the ring parametres (center, normal, radius). So, adding `std = 1` noise will add white noise with a standard deviation of 1, independently distributed, to each parameter in the positioning.
 
 <br>
 
