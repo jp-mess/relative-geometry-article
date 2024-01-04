@@ -322,6 +322,8 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
 
 "Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us. I'll attempt to quantify the benefit of using a geometric prior by setting up some simulations that illustrate this point.
 
+<br>
+
 ## Crazy high camera noise 
 
 <p align="center">
@@ -364,6 +366,7 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
   16  3.521839e+09    3.52e+09    1.20e+11   9.97e+00   7.23e-01  9.61e-01        1    5.44e+00    5.03e+01
 ```
 
+<br>
 
 ## Realistic noise scenario
 
@@ -393,6 +396,7 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
    4  1.612429e-11    8.49e-04    1.51e-02   1.02e-04   1.00e+00  8.10e+05        1    5.57e+00    2.83e+01
 ```
 
+<br>
 
 ## Terrible initial ring estimate
 
