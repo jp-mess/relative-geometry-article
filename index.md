@@ -121,9 +121,8 @@ bool operator()(const T* const extrinsic_params, // Camera parameters
   const T& cx = intrinsics[1];
   const T& cy = intrinsics[2];
 
-  const T kEpsilon = T(1e-4);
-  const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
-  const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
+  const T xp = rotated_translated_point[0] / rotated_translated_point[2];
+  const T yp = rotated_translated_point[1] / rotated_translated_point[2];
 
   const T predicted_x = focal * xp + cx;
   const T predicted_y = focal * yp + cy;
@@ -295,9 +294,8 @@ bool operator()(const T* const extrinsic_params, // Camera parameters
     const T& cx = intrinsics[1];
     const T& cy = intrinsics[2];
 
-    const T kEpsilon = T(1e-4);
-    const T xp = rotated_translated_point[0] / (rotated_translated_point[2] + kEpsilon);
-    const T yp = rotated_translated_point[1] / (rotated_translated_point[2] + kEpsilon);
+    const T xp = rotated_translated_point[0] / rotated_translated_point[2];
+    const T yp = rotated_translated_point[1] / rotated_translated_point[2];
 
     const T predicted_x = focal * xp + cx;
     const T predicted_y = focal * yp + cy;
