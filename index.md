@@ -318,7 +318,78 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
 1. How good our initial ring estimate is
 2. How good our initial camera estimates are
 
-"Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us.
+"Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us. I'll attempt to quantify the benefit of using a geometric prior by setting up some simulations that illustrate this point.
+
+## High (unrealistic) noise 
+
+When the camera positional noise is high (`std = 2`) and the ring noise is high (`std = 0.6`). The ring solver converges with an average camera positioning error of `0.21`, which isn't too bad, considering how bad our initial camera estimates were. Here's the optimizer log, which tells us that we've converged, but remember that this is just the reprojection error, which often has little bearing on the global accuracy.
+
+```bash
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  1.419799e+10    0.00e+00    3.38e+10   0.00e+00   0.00e+00  1.00e+04        0    1.21e+01    1.22e+01
+   1  1.815157e+09    1.24e+10    4.90e+09   0.00e+00   8.75e-01  1.73e+04        1    1.30e+01    2.52e+01
+   2  1.146844e+08    1.70e+09    6.92e+08   4.05e+01   9.42e-01  5.19e+04        1    1.28e+01    3.80e+01
+   3  5.338989e+06    1.09e+08    2.61e+08   3.21e+01   9.57e-01  1.56e+05        1    1.30e+01    5.10e+01
+   4  1.254573e+04    5.33e+06    1.28e+07   5.70e+00   9.98e-01  4.67e+05        1    1.29e+01    6.39e+01
+   5  2.251619e-02    1.25e+04    1.88e+04   3.30e-01   1.00e+00  1.40e+06        1    1.27e+01    7.66e+01
+   6  7.283842e-13    2.25e-02    3.86e-02   3.17e-04   1.00e+00  4.20e+06        1    1.28e+01    8.94e+01
+```
+
+Without the ring, Levenberg-Marquardt does not converge at all in this case:
+
+```bash
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  2.108337e+13    0.00e+00    1.18e+17   0.00e+00   0.00e+00  1.00e+04        0    5.62e+00    5.76e+00
+   1  5.267212e+12    1.58e+13    1.47e+16   0.00e+00   7.50e-01  1.14e+04        1    5.56e+00    1.13e+01
+   2  2.928386e+13   -2.40e+13    1.47e+16   2.35e+02  -4.56e+00  5.72e+03        1    4.17e-02    1.14e+01
+   3  1.342499e+12    3.92e+12    1.84e+15   2.34e+02   7.45e-01  6.48e+03        1    5.64e+00    1.70e+01
+   4  5.416423e+12   -4.07e+12    1.84e+15   2.55e+02  -3.04e+00  3.24e+03        1    4.12e-02    1.70e+01
+   5  4.398051e+11    9.03e+11    2.30e+14   2.52e+02   6.73e-01  3.38e+03        1    5.50e+00    2.25e+01
+   6  1.131124e+11    3.27e+11    2.88e+13   1.88e+02   7.45e-01  3.83e+03        1    5.43e+00    2.80e+01
+   7  2.925539e+10    8.39e+10    3.60e+12   1.19e+02   7.49e-01  4.36e+03        1    5.45e+00    3.34e+01
+   8  8.057524e+09    2.12e+10    4.54e+11   2.00e+02   7.43e-01  4.93e+03        1    5.55e+00    3.90e+01
+   9  1.437565e+11   -1.36e+11    4.54e+11   9.97e+01  -1.80e+01  2.47e+03        1    4.05e-02    3.90e+01
+  10  2.895490e+12   -2.89e+12    4.54e+11   7.73e+01  -3.88e+02  6.16e+02        1    3.95e-02    3.91e+01
+  11  9.903655e+10   -9.10e+10    4.54e+11   8.13e+01  -1.24e+01  7.70e+01        1    3.80e-02    3.91e+01
+  12  7.040723e+09    1.02e+09    4.39e+11   5.52e+01   1.39e-01  5.60e+01        1    5.60e+00    4.47e+01
+  13  1.496931e+10   -7.93e+09    4.39e+11   3.25e+01  -1.30e+00  2.80e+01        1    4.03e-02    4.47e+01
+  14  1.946917e+10   -1.24e+10    4.39e+11   2.58e+01  -2.09e+00  7.00e+00        1    3.90e-02    4.48e+01
+  15  2.455492e+10   -1.75e+10    4.39e+11   1.88e+01  -3.17e+00  8.75e-01        1    4.16e-02    4.48e+01
+  16  3.521839e+09    3.52e+09    1.20e+11   9.97e+00   7.23e-01  9.61e-01        1    5.44e+00    5.03e+01
+```
+
+
+## Medium (realistic) noise
+
+I've now set the camera positional noise scale to `std = 0.5`, and the noise in all the ring parameters to `std = 0.1`. The ring estimator converges quickly to a global error of `0.18`
+
+```bash
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  3.815457e+08    0.00e+00    1.81e+09   0.00e+00   0.00e+00  1.00e+04        0    1.22e+01    1.24e+01
+   1  2.701266e+06    3.79e+08    1.74e+08   0.00e+00   9.93e-01  3.00e+04        1    1.29e+01    2.53e+01
+   2  1.157033e+02    2.70e+06    6.52e+05   2.82e+00   1.00e+00  9.00e+04        1    1.28e+01    3.81e+01
+   3  1.304723e-04    1.16e+02    1.47e+03   4.58e-02   1.00e+00  2.70e+05        1    1.26e+01    5.07e+01
+   4  3.832776e-12    1.30e-04    9.16e-03   6.88e-05   1.00e+00  8.10e+05        1    1.32e+01    6.39e+01
+```
+
+While the basic estimator converges to a global error of `2.43`. We would expect this in the case when the prior estiamte for the ring is comparatively. Bundle Adjustment minimizes reprojection error, which, without a geometric prior, does not always equate to high geometric accuracy (the points could be in the wrong country entirely, but still have a low reprojection error).
+
+```bash
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  3.872072e+08    0.00e+00    1.85e+08   0.00e+00   0.00e+00  1.00e+04        0    5.68e+00    5.80e+00
+   1  3.121777e+06    3.84e+08    1.52e+07   0.00e+00   9.92e-01  3.00e+04        1    5.58e+00    1.14e+01
+   2  7.910206e+02    3.12e+06    2.61e+05   4.41e+00   1.00e+00  9.00e+04        1    5.56e+00    1.69e+01
+   3  8.488959e-04    7.91e+02    3.26e+02   8.72e-02   1.00e+00  2.70e+05        1    5.75e+00    2.27e+01
+   4  1.612429e-11    8.49e-04    1.51e-02   1.02e-04   1.00e+00  8.10e+05        1    5.57e+00    2.83e+01
+```
+
+
+## Bad initial ring estimate
+
+
+
+
+
 
 
 
