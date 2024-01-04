@@ -330,7 +330,7 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
   <img src="diagrams/high_noise.png" alt="High Noise" style="width: 50%; height: auto;"/>
 </p>
 
-When the camera positional noise is unrealistically high (`std = 2`) and the ring noise is high (`std = 0.6`). The ring solver converges with an average camera positioning error of `0.21`, which isn't too bad, considering how bad our initial camera estimates were. Here's the optimizer log, which tells us that we've converged, but remember that this is just the reprojection error, which often has little bearing on the global accuracy.
+In the image above, the camera positional noise is unrealistically high (`std = 2`), and the ring noise is somewhat high (`std = 0.6`). The ring solver converges with an average camera positioning error of `0.21`, which isn't too bad, considering how bad our initial camera estimates were. Here's the optimizer log, which tells us that we've converged, but remember that this is just the reprojection error, which often has little bearing on the global accuracy. The ring estimator converges because it "snaps" the cameras to the initial ring in the first iteration (using orthogonal projection).
 
 ```bash
 iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
