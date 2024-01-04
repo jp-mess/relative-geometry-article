@@ -324,6 +324,10 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
 
 ## Crazy high camera noise 
 
+<p align="center">
+  <img src="diagrams/high_noise.png" alt="High Noise" style="width: 50%; height: auto;"/>
+</p>
+
 When the camera positional noise is unrealistically high (`std = 2`) and the ring noise is high (`std = 0.6`). The ring solver converges with an average camera positioning error of `0.21`, which isn't too bad, considering how bad our initial camera estimates were. Here's the optimizer log, which tells us that we've converged, but remember that this is just the reprojection error, which often has little bearing on the global accuracy.
 
 ```bash
@@ -363,6 +367,10 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
 
 ## Realistic noise scenario
 
+<p align="center">
+  <img src="diagrams/medium_noise.png" alt="Medium Noise" style="width: 50%; height: auto;"/>
+</p>
+
 I've now set the camera positional noise scale to `std = 0.5`, and the noise in all the ring parameters to `std = 0.1`. I think this would be realistic for both. The ring estimator converges quickly to a global error of `0.18`
 
 ```bash
@@ -374,7 +382,7 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
    4  3.832776e-12    1.30e-04    9.16e-03   6.88e-05   1.00e+00  8.10e+05        1    1.32e+01    6.39e+01
 ```
 
-While the basic estimator converges to a global error of `2.43`. We would expect this in the case when the prior estiamte for the ring is comparatively. Bundle Adjustment minimizes reprojection error, which, without a geometric prior, does not always equate to high geometric accuracy (the points could be in the wrong country entirely, but still have a low reprojection error).
+While the basic estimator converges to a global error of `2.43`. We would expect this in the case when the prior estiamte for the ring is comparatively. **Bundle Adjustment minimizes reprojection error, which, without a geometric prior, does not always equate to high geometric accuracy (the points could be in the wrong country entirely, but still have a low reprojection error)**.
 
 ```bash
 iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
@@ -386,7 +394,11 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
 ```
 
 
-## Unrealistically bad initial ring estimate
+## Terrible initial ring estimate
+
+<p align="center">
+  <img src="diagrams/bad_initial_ring.png" alt="Bad Initial Ring" style="width: 50%; height: auto;"/>
+</p>
 
 If you don't have any kind of an estimate of where the ring should be (`std = 2` noise on all ring parameters), then the ring estimate will totally fail, while your regular estimate will be okay (consistent with the previous examples). The ring estimator's optimizer log before ceres decided to give up:
 
