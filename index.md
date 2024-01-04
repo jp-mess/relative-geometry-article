@@ -29,7 +29,9 @@ title: Geometric Priors in Ceres (demo)
 <br>
 
 
-**Geometric Priors:** What if we know (beforehand) that all the cameras in this system lie on a ring, like in the diagram above? Could we use that information be helpful in estimating the positions of the 6 cameras? This is what I would call a "geometric prior", and in real-world applications this is a common scenario because the cameras will be on some sort of rig (or robot). It could also be called a "geometric constraint", but that would imply it makes the optimization more difficult, when in reality it makes it easier. Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization, and it generally makes the optimization more efficient if you have a reasonable prior estimate of that geometry (i.e. you know the ring should be roughly horizontal and above the car, not below it). Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
+**Geometric Priors:** What if we know (beforehand) that all the cameras in this system lie on a ring, like in the diagram above? Could we use that information be helpful in estimating the positions of the 6 cameras? This is what I would call a "geometric prior", and in real-world applications this is a common scenario because the cameras will be on some sort of rig (or robot). It could also be called a "geometric constraint", but that would imply it makes the optimization more difficult, when in reality it makes it easier, and the output global error will be lower, since vanilla bundle adjustment works on reprojection error alone, and has no global reference of where to put its output. 
+
+Any relative geometric constraint imposed on the cameras can be implemented as a reparameterization, and it generally makes the optimization more efficient if you have a reasonable prior estimate of that geometry (i.e. you know the ring should be roughly horizontal and above the car, not below it). Instead of learning all of the 3D positions of the cameras independently, ceres can learn the 6 parameters for the 3D ring, and then for each camera, simply learn the angle of the ring that each camera falls on. This trick can also work for:
 
 1. Planes, lines, or other geometric shapes with a small number of parameters
 2. Relative distances (enforce all cameras to be the same distance away)
@@ -320,9 +322,9 @@ Aside from having less overall camera extrinsic parameters (38 instead of 60), i
 
 "Ring" bundle adjustment does better than "basic" bundle adjustment when the initial ring estimate is good compared to the initial camera estimates. If the initial camera estimates are great, then the ring doesn't have much opportunity to do much. If the initial ring estimate is bad, then it hurts us more than helps us. I'll attempt to quantify the benefit of using a geometric prior by setting up some simulations that illustrate this point.
 
-## High (unrealistic) noise 
+## Crazy high camera noise 
 
-When the camera positional noise is high (`std = 2`) and the ring noise is high (`std = 0.6`). The ring solver converges with an average camera positioning error of `0.21`, which isn't too bad, considering how bad our initial camera estimates were. Here's the optimizer log, which tells us that we've converged, but remember that this is just the reprojection error, which often has little bearing on the global accuracy.
+When the camera positional noise is unrealistically high (`std = 2`) and the ring noise is high (`std = 0.6`). The ring solver converges with an average camera positioning error of `0.21`, which isn't too bad, considering how bad our initial camera estimates were. Here's the optimizer log, which tells us that we've converged, but remember that this is just the reprojection error, which often has little bearing on the global accuracy.
 
 ```bash
 iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
@@ -359,9 +361,9 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
 ```
 
 
-## Medium (realistic) noise
+## Realistic noise scenario
 
-I've now set the camera positional noise scale to `std = 0.5`, and the noise in all the ring parameters to `std = 0.1`. The ring estimator converges quickly to a global error of `0.18`
+I've now set the camera positional noise scale to `std = 0.5`, and the noise in all the ring parameters to `std = 0.1`. I think this would be realistic for both. The ring estimator converges quickly to a global error of `0.18`
 
 ```bash
 iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
@@ -384,7 +386,39 @@ iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_
 ```
 
 
-## Bad initial ring estimate
+## Unrealistically bad initial ring estimate
+
+If you don't have any kind of an estimate of where the ring should be (`std = 2` noise on all ring parameters), then the ring estimate will totally fail, while your regular estimate will be okay (consistent with the previous examples). The ring estimator's optimizer log before ceres decided to give up:
+
+```bash
+iter      cost      cost_change  |gradient|   |step|    tr_ratio  tr_radius  ls_iter  iter_time  total_time
+   0  3.695828e+10    0.00e+00    2.62e+11   0.00e+00   0.00e+00  1.00e+04        0    1.33e+01    1.35e+01
+   1  9.833985e+09    2.71e+10    4.04e+10   0.00e+00   7.36e-01  1.12e+04        1    1.33e+01    2.67e+01
+   2  9.686036e+15   -9.69e+15    4.04e+10   8.26e+02  -1.01e+06  5.59e+03        1    2.68e-01    2.70e+01
+   3  6.193782e+15   -6.19e+15    4.04e+10   6.82e+02  -6.46e+05  1.40e+03        1    2.72e-01    2.72e+01
+   4  1.287654e+16   -1.29e+16    4.04e+10   3.50e+02  -1.35e+06  1.75e+02        1    2.54e-01    2.75e+01
+   5  1.806553e+09    8.03e+09    5.78e+09   1.08e+02   8.44e-01  2.59e+02        1    1.20e+01    3.95e+01
+   6  2.501211e+08    1.56e+09    8.96e+08   5.05e+01   9.34e-01  7.52e+02        1    1.17e+01    5.12e+01
+   7  1.726336e+08    7.75e+07    5.63e+08   9.67e+01   5.72e-01  7.54e+02        1    1.17e+01    6.29e+01
+   8  1.199832e+08    5.27e+07    1.98e+08   1.23e+02   8.79e-01  1.34e+03        1    1.17e+01    7.46e+01
+   9  1.242681e+08   -4.28e+06    1.98e+08   2.07e+02  -3.70e-01  6.68e+02        1    2.13e-01    7.48e+01
+  10  1.117673e+08    8.22e+06    1.18e+08   1.20e+02   8.34e-01  9.50e+02        1    1.17e+01    8.65e+01
+  11  1.458582e+08   -3.41e+07    1.18e+08   1.48e+02  -4.98e+00  4.75e+02        1    2.06e-01    8.67e+01
+  12  1.106560e+08    1.11e+06    2.00e+08   8.60e+01   2.10e-01  3.98e+02        1    1.17e+01    9.84e+01
+  13  1.393557e+08   -2.87e+07    2.00e+08   9.48e+01  -2.31e+00  1.99e+02        1    2.26e-01    9.86e+01
+  14  1.042820e+08    6.37e+06    2.64e+08   5.24e+01   6.17e-01  2.01e+02        1    1.30e+01    1.12e+02
+  15  1.464388e+08   -4.22e+07    2.64e+08   8.23e+01  -1.98e+00  1.01e+02        1    2.52e-01    1.12e+02
+  16  9.476664e+07    9.52e+06    3.69e+08   4.56e+01   5.52e-01  1.01e+02        1    1.34e+01    1.25e+02
+  17  9.216740e+07    2.60e+06    5.60e+08   3.72e+01   8.55e-02  6.42e+01        1    1.34e+01    1.39e+02
+  18  5.040414e+07    4.18e+07    1.54e+08   3.32e+01   9.86e-01  1.93e+02        1    1.35e+01    1.52e+02
+  19  4.556504e+07    4.84e+06    5.13e+07   2.56e+01   9.90e-01  5.78e+02        1    1.33e+01    1.65e+02
+  20  4.518771e+07    3.77e+05    2.02e+06   6.98e+00   1.03e+00  1.73e+03        1    1.23e+01    1.78e+02
+  21  4.518153e+07    6.18e+03    1.15e+05   1.53e+00   1.16e+00  5.20e+03        1    1.36e+01    1.91e+02
+  22  4.518110e+07    4.29e+02    6.19e+04   3.28e-01   1.36e+00  1.56e+04        1    1.36e+01    2.05e+02
+  23  4.518102e+07    8.21e+01    3.45e+04   9.56e-02   1.50e+00  4.68e+04        1    1.38e+01    2.19e+02
+```
+
+
 
 
 
