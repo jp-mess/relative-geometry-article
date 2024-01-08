@@ -1,5 +1,5 @@
 ---
-title: Geometric Priors in Ceres
+title: Geometric Priors in Bundle Adjustment
 ---
 
 ### [Author: John (Jack) Messerly](https://www.linkedin.com/in/jack-messerly-567b9b96/)
