@@ -3,8 +3,8 @@ title: Geometric Priors in Bundle Adjustment
 ---
 
 ### [Author: John (Jack) Messerly](https://www.linkedin.com/in/jack-messerly-567b9b96/)
-### [some more sample work](https://jp-mess.github.io/blog-main/)
-### [show me the code!](https://github.com/jp-mess/ceres-geometric-constraints)
+### [other sample work](https://jp-mess.github.io/blog-main/)
+### [code](https://github.com/jp-mess/ceres-geometric-constraints)
 
 <br>
 <br>  
